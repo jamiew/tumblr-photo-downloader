@@ -1,7 +1,9 @@
 Tumblr Photo Downloader
 =======================
 
-Downloads all the photos from a Tumblr blog.
+Ruby script to download all the photos from a Tumblr blog.
+
+Tumblr also has a GUI backup tool for Mac, [Tumblr Backup.app](http://staff.tumblr.com/post/286303145/tumblr-backup-mac-beta)
 
 
 Usage
