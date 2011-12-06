@@ -2,20 +2,26 @@ require 'rubygems'
 require 'bundler'
 Bundler.require
 
+site = ARGV[0]
 
-# Your Tumblr subdomain, e.g. "jamiew" for "jamiew.tumblr.com"
-site = "doctorwho"
-
-
-FileUtils.mkdir_p(site)
+if site.nil? || site.empty?
+  puts
+  puts "Usage: #{File.basename(__FILE__)} [jamiew]"
+  puts
+  puts "(assuming your Tumblr blog is 'jamiew.tumblr.com')"
+  puts
+  exit 1
+end
 
 concurrency = 8
 num = 50
 start = 0
 
-loop do
-  puts "start=#{start}"
+puts "Downloading photos from #{site}.tumblr.com using #{concurrency} threads ..."
+dir = "#{site}.tumblr.com"
+FileUtils.mkdir_p(dir)
 
+loop do
   url = "http://#{site}.tumblr.com/api/read?type=photo&num=#{num}&start=#{start}"
   page = Mechanize.new.get(url)
   doc = Nokogiri::XML.parse(page.body)
@@ -31,7 +37,7 @@ loop do
         begin
           file = Mechanize.new.get(url)
           filename = File.basename(file.uri.to_s.split('?')[0])
-          file.save_as("#{site}/#{filename}")
+          file.save_as("#{dir}/#{filename}")
         rescue Mechanize::ResponseCodeError
           puts "Error getting file, #{$!}"
         end
@@ -42,7 +48,7 @@ loop do
 
   puts "#{images.count} images found (num=#{num})"
   if images.count < num
-    puts "our work here is done"
+    puts "Our work here is done"
     break
   else
     start += num
