@@ -6,23 +6,21 @@ site = ARGV[0]
 
 if site.nil? || site.empty?
   puts
-  puts "Usage: #{File.basename(__FILE__)} [jamiew]"
-  puts
-  puts "(assuming your Tumblr blog is 'jamiew.tumblr.com')"
+  puts "Usage: #{File.basename(__FILE__)} [jamiew.tumblr.com]"
   puts
   exit 1
 end
 
 concurrency = 8
+
+puts "Downloading photos from #{site.inspect}, concurrency=#{concurrency} ..."
+FileUtils.mkdir_p(site)
+
 num = 50
 start = 0
 
-puts "Downloading photos from #{site}.tumblr.com using #{concurrency} threads ..."
-dir = "#{site}.tumblr.com"
-FileUtils.mkdir_p(dir)
-
 loop do
-  url = "http://#{site}.tumblr.com/api/read?type=photo&num=#{num}&start=#{start}"
+  url = "http://#{site}/api/read?type=photo&num=#{num}&start=#{start}"
   page = Mechanize.new.get(url)
   doc = Nokogiri::XML.parse(page.body)
 
@@ -37,7 +35,7 @@ loop do
         begin
           file = Mechanize.new.get(url)
           filename = File.basename(file.uri.to_s.split('?')[0])
-          file.save_as("#{dir}/#{filename}")
+          file.save_as("#{site}/#{filename}")
         rescue Mechanize::ResponseCodeError
           puts "Error getting file, #{$!}"
         end
