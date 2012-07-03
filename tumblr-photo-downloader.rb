@@ -3,10 +3,13 @@ require 'bundler'
 Bundler.require
 
 site = ARGV[0]
+directory = ARGV[1] ? ARGV[1] : site
 
 if site.nil? || site.empty?
   puts
-  puts "Usage: #{File.basename(__FILE__)} [jamiew.tumblr.com]"
+  puts "Usage: #{File.basename(__FILE__)} URL [directory to save in]"
+  puts "eg. #{File.basename(__FILE__)} jamiew.tumblr.com"
+  puts "eg. #{File.basename(__FILE__)} jamiew.tumblr.com ~/pictures/jamiew-tumblr-images/"
   puts
   exit 1
 end
@@ -14,7 +17,7 @@ end
 concurrency = 8
 
 puts "Downloading photos from #{site.inspect}, concurrency=#{concurrency} ..."
-FileUtils.mkdir_p(site)
+FileUtils.mkdir_p(directory)
 
 num = 50
 start = 0
@@ -35,7 +38,7 @@ loop do
         begin
           file = Mechanize.new.get(url)
           filename = File.basename(file.uri.to_s.split('?')[0])
-          file.save_as("#{site}/#{filename}")
+          file.save_as("#{directory}/#{filename}")
         rescue Mechanize::ResponseCodeError
           puts "Error getting file, #{$!}"
         end
