@@ -3,10 +3,13 @@ require 'bundler'
 Bundler.require
 
 site = ARGV[0]
+directory = ARGV[1] ? ARGV[1] : site
 
 if site.nil? || site.empty?
   puts
-  puts "Usage: #{File.basename(__FILE__)} [jamiew.tumblr.com]"
+  puts "Usage: #{File.basename(__FILE__)} URL [directory to save in]"
+  puts "eg. #{File.basename(__FILE__)} jamiew.tumblr.com"
+  puts "eg. #{File.basename(__FILE__)} jamiew.tumblr.com ~/pictures/jamiew-tumblr-images/"
   puts
   exit 1
 end
@@ -14,7 +17,7 @@ end
 concurrency = 8
 
 puts "Downloading photos from #{site.inspect}, concurrency=#{concurrency} ..."
-FileUtils.mkdir_p(site)
+FileUtils.mkdir_p(directory)
 
 num = 50
 start = 0
@@ -27,15 +30,24 @@ loop do
   images = (doc/'post photo-url').select{|x| x if x['max-width'].to_i == 1280 }
   image_urls = images.map {|x| x.content }
 
+  already_had = 0
+  
   image_urls.each_slice(concurrency).each do |group|
     threads = []
     group.each do |url|
       threads << Thread.new {
-        puts "Saving photo #{url}"
         begin
           file = Mechanize.new.get(url)
           filename = File.basename(file.uri.to_s.split('?')[0])
-          file.save_as("#{site}/#{filename}")
+          
+          if File.exists?("#{directory}/#{filename}")
+            puts "Already have #{url}"
+            already_had += 1
+          else
+            puts "Saving photo #{url}"
+            file.save_as("#{directory}/#{filename}")
+          end
+
         rescue Mechanize::ResponseCodeError
           puts "Error getting file, #{$!}"
         end
@@ -45,8 +57,12 @@ loop do
   end
 
   puts "#{images.count} images found (num=#{num})"
+  
   if images.count < num
     puts "Our work here is done"
+    break
+  elsif already_had == num
+    puts "Had already downloaded the last #{already_had} of #{num} most recent images - done."
     break
   else
     start += num
