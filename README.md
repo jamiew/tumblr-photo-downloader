@@ -25,10 +25,10 @@ Run the script, specifying your blog URL as the argument:
 
 By default, images will be saved in a sub-directory of the directory containing the script (eg tumblr-photo-downloader/jamiew.tumblr.com). If you want them to be saved to a different directory, you can pass its name as an optional second argument:
 
-    ruby tumblr-photo-downloader.rb jamiew.tumblr.com ~/pictures/jamiew-tumblr-images/ 
+    ruby tumblr-photo-downloader.rb jamiew.tumblr.com ~/pictures/jamiew-tumblr-images/
 
 If you have run the script previously, specifying the same Tumblr URL and destination directory, then it will stop after sequentially encountering links to 50 images that have been previously downloaded.
- 
+
 Enjoy!
 
 
@@ -44,6 +44,7 @@ Pull requests welcome.
 Authors
 -------
 
-* [Jamie Wilkinson](http://jamiedubs.com) ([@jamiew](http://github.com/jamiew))
+* [Jamie Wilkinson](http://jamiedubs.com) ([@jamiew](https://github.com/jamiew))
+* [James Scott-Brown](http://jamesscottbrown.com/) ([@jamesscottbrown](https://github.com/jamesscottbrown))
 
 
