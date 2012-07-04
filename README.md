@@ -27,6 +27,8 @@ By default, images will be saved in a sub-directory of the directory containing 
 
     ruby tumblr-photo-downloader.rb jamiew.tumblr.com ~/pictures/jamiew-tumblr-images/ 
 
+If you have run the script previously, specifying the same Tumblr URL and destination directory, then it will stop after sequentially encountering links to 50 images that have been previously downloaded.
+ 
 Enjoy!
 
 
