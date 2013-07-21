@@ -24,22 +24,36 @@ start = 0
 
 loop do
   url = "http://#{site}/api/read?type=photo&num=#{num}&start=#{start}"
-  page = Mechanize.new.get(url)
+  begin
+    puts "Getting new page..."
+    page = Mechanize.new.get(url)
+  rescue
+    puts "Error getting new page from tumblr."
+    puts "Retrying..."
+    retry
+  end
   doc = Nokogiri::XML.parse(page.body)
 
   images = (doc/'post photo-url').select{|x| x if x['max-width'].to_i == 1280 }
   image_urls = images.map {|x| x.content }
 
   already_had = 0
-  
+
   image_urls.each_slice(concurrency).each do |group|
     threads = []
     group.each do |url|
       threads << Thread.new {
         begin
-          file = Mechanize.new.get(url)
+          begin
+            file = Mechanize.new.get(url)
+          rescue Exception
+            puts "Error getting photo #{url}\n"
+            puts "Retrying...\n"
+            retry
+          end
+
           filename = File.basename(file.uri.to_s.split('?')[0])
-          
+
           if File.exists?("#{directory}/#{filename}")
             puts "Already have #{url}"
             already_had += 1
@@ -57,7 +71,7 @@ loop do
   end
 
   puts "#{images.count} images found (num=#{num})"
-  
+
   if images.count < num
     puts "Our work here is done"
     break
