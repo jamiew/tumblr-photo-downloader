@@ -44,21 +44,19 @@ loop do
     group.each do |url|
       threads << Thread.new {
         begin
-          begin
-            file = Mechanize.new.get(url)
-          rescue Exception
-            puts "Error getting photo #{url}\n"
-            puts "Retrying...\n"
-            retry
-          end
-
-          filename = File.basename(file.uri.to_s.split('?')[0])
-
+          filename = url.split("/").last
           if File.exists?("#{directory}/#{filename}")
-            puts "Already have #{url}"
+            puts "Already have #{url}\n"
             already_had += 1
           else
-            puts "Saving photo #{url}"
+            begin
+              file = Mechanize.new.get(url)
+            rescue Exception
+              puts "Error getting photo #{url}\n"
+              puts "Retrying...\n"
+              retry
+            end
+            puts "Saving photo #{filename}\n"
             file.save_as("#{directory}/#{filename}")
           end
 
@@ -78,7 +76,7 @@ loop do
   elsif already_had == num
     puts "Had already downloaded the last #{already_had} of #{num} most recent images - done."
     break
-  else
+    else
     start += num
   end
 
