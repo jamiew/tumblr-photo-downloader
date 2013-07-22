@@ -95,7 +95,7 @@ loop do
   end
 
   if images.count == done_images
-    # touched (downloaded or skipped) all found images
+    # processed (downloaded or skipped) all found images
     if fullbackup && images.count > 0
       # doing full backup and not yet reached the end of tumblr archive
       start += num
