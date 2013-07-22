@@ -29,6 +29,14 @@ By default, images will be saved in a sub-directory of the directory containing 
 
 If you have run the script previously, specifying the same Tumblr URL and destination directory, then it will stop after sequentially encountering links to 50 images that have been previously downloaded.
 
+If you want to download all the images from the blog you can specify "fullbackup" as the optional third argument. Additionally, you can set a limit of maximum number of images you want the script to download, as the optional fourth argument:
+
+    ruby tumblr-photo-downloader.rb jamiew.tumblr.com ~/pictures/jamiew-tumblr-images/ fullbackup
+
+or:
+
+    ruby tumblr-photo-downloader.rb jamiew.tumblr.com ~/pictures/jamiew-tumblr-images/ fullbackup 400
+
 Enjoy!
 
 
