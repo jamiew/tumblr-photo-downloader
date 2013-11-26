@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'bundler'
+require 'digest/md5'
 Bundler.require
 
 site = ARGV[0]
@@ -16,8 +17,14 @@ end
 
 concurrency = 8
 
+# Create a log directory
+logs = [directory, 'logs'].join('/')
+
 puts "Downloading photos from #{site.inspect}, concurrency=#{concurrency} ..."
 FileUtils.mkdir_p(directory)
+
+# Make the log directory
+FileUtils.mkdir_p(logs)
 
 num = 50
 start = 0
@@ -25,6 +32,13 @@ start = 0
 loop do
   url = "http://#{site}/api/read?type=photo&num=#{num}&start=#{start}"
   page = Mechanize.new.get(url)
+  md5 = Digest::MD5.hexdigest(page.to_s)
+
+  # Log the content that we are getting
+  File.open([logs, md5].join('/'), 'w') { | f |
+    f.write(page.to_s)
+  }
+
   doc = Nokogiri::XML.parse(page.body)
 
   images = (doc/'post photo-url').select{|x| x if x['max-width'].to_i == 1280 }
