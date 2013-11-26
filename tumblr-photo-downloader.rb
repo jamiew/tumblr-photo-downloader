@@ -32,14 +32,14 @@ start = 0
 loop do
   url = "http://#{site}/api/read?type=photo&num=#{num}&start=#{start}"
   page = Mechanize.new.get(url)
-  md5 = Digest::MD5.hexdigest(page.to_s)
+
+  doc = Nokogiri::XML.parse(page.body)
+  md5 = Digest::MD5.hexdigest(doc.to_s)
 
   # Log the content that we are getting
   File.open([logs, md5].join('/'), 'w') { | f |
-    f.write(page.to_s)
+    f.write(doc.to_s)
   }
-
-  doc = Nokogiri::XML.parse(page.body)
 
   images = (doc/'post photo-url').select{|x| x if x['max-width'].to_i == 1280 }
   image_urls = images.map {|x| x.content }
