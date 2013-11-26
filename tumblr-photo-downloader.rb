@@ -21,6 +21,7 @@ FileUtils.mkdir_p(directory)
 
 num = 50
 start = 0
+allImages = []
 
 loop do
   url = "http://#{site}/api/read?type=photo&num=#{num}&start=#{start}"
@@ -32,6 +33,16 @@ loop do
 
   already_had = 0
   
+  # Eliminate duplicate images.
+  image_urls.sort!
+  image_urls.uniq!
+  
+  # Eliminate images we've already downloaded
+  image_urls = image_urls - allImages
+
+  # Add this to the list
+  allImages << image_urls
+
   image_urls.each_slice(concurrency).each do |group|
     threads = []
     group.each do |url|
