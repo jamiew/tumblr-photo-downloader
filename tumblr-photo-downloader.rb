@@ -48,7 +48,7 @@ loop do
             file.save_as("#{directory}/#{filename}")
           end
 
-        rescue Mechanize::ResponseCodeError
+        rescue
           puts "Error getting file, #{$!}"
         end
       }
