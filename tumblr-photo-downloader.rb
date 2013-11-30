@@ -19,15 +19,12 @@ concurrency = 8
 
 # Create a log directory
 logs = [directory, 'logs'].join('/')
-
-puts "Downloading photos from #{site.inspect}, concurrency=#{concurrency} ..."
-FileUtils.mkdir_p(directory)
-
-# Make the log directory
 FileUtils.mkdir_p(logs)
 
 num = 50
 start = 0
+
+puts "Downloading photos from #{site.inspect}, concurrency=#{concurrency} ..."
 
 loop do
   url = "http://#{site}/api/read?type=photo&num=#{num}&start=#{start}"
@@ -45,7 +42,7 @@ loop do
   image_urls = images.map {|x| x.content }
 
   already_had = 0
-  
+
   image_urls.each_slice(concurrency).each do |group|
     threads = []
     group.each do |url|
@@ -53,7 +50,7 @@ loop do
         begin
           file = Mechanize.new.get(url)
           filename = File.basename(file.uri.to_s.split('?')[0])
-          
+
           if File.exists?("#{directory}/#{filename}")
             puts "Already have #{url}"
             already_had += 1
@@ -71,7 +68,7 @@ loop do
   end
 
   puts "#{images.count} images found (num=#{num})"
-  
+
   if images.count < num
     puts "Our work here is done"
     break
