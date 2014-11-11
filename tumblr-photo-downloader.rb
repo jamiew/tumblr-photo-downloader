@@ -48,10 +48,9 @@ loop do
     group.each do |url|
       threads << Thread.new {
         begin
-          head = Mechanize.new.head(url)
-          filename = File.basename(head.uri.to_s.split('?')[0])
+          filename = File.basename(url.split('?')[0])
 
-          if File.exists?("#{directory}/#{filename}") and head["content-length"].to_i === File.stat("#{directory}/#{filename}").size.to_i
+          if File.exists?("#{directory}/#{filename}") and Mechanize.new.head(url)["content-length"].to_i === File.stat("#{directory}/#{filename}").size.to_i
             puts "Already have #{url}"
             already_had += 1
           else
