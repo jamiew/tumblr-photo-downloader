@@ -57,5 +57,6 @@ Authors
 * [Jamie Wilkinson](http://jamiedubs.com) ([@jamiew](https://github.com/jamiew))
 * [James Scott-Brown](http://jamesscottbrown.com/) ([@jamesscottbrown](https://github.com/jamesscottbrown))
 * [Chris McKenzie](http://getpostdelete.com/) ([@kristopolous](https://github.com/kristopolous))
+* [@zamabe](https://github.com/zamabe)
 
 
