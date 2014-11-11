@@ -48,14 +48,14 @@ loop do
     group.each do |url|
       threads << Thread.new {
         begin
-          file = Mechanize.new.get(url)
-          filename = File.basename(file.uri.to_s.split('?')[0])
+          filename = File.basename(url.split('?')[0])
 
-          if File.exists?("#{directory}/#{filename}")
+          if File.exists?("#{directory}/#{filename}") and Mechanize.new.head(url)["content-length"].to_i === File.stat("#{directory}/#{filename}").size.to_i
             puts "Already have #{url}"
             already_had += 1
           else
             puts "Saving photo #{url}"
+            file = Mechanize.new.get(url)
             file.save_as("#{directory}/#{filename}")
           end
 
