@@ -17,7 +17,7 @@ end
 
 concurrency = 8
 
-# Create a log directory
+# Create log with md5 hashes of pages we've visited
 logs = [directory, 'logs'].join('/')
 FileUtils.mkdir_p(logs)
 
@@ -30,29 +30,33 @@ loop do
   url = "http://#{site}/api/read?type=photo&num=#{num}&start=#{start}"
   page = Mechanize.new.get(url)
 
-  doc = Nokogiri::XML.parse(page.body)
-  md5 = Digest::MD5.hexdigest(doc.to_s)
+  page = Nokogiri::XML.parse(page.body)
+  md5 = Digest::MD5.hexdigest(page.to_s)
 
   # Log the content that we are getting
+  puts "#{url} => #{[logs, md5].join('/')}"
   File.open([logs, md5].join('/'), 'w') { | f |
-    f.write(doc.to_s)
+    f.write(page.to_s)
   }
 
-  images = (doc/'post photo-url').select{|x| x if x['max-width'].to_i == 1280 }
+  images = (page/'post photo-url').select{|x| x if x['max-width'].to_i == 1280 }
   image_urls = images.map {|x| x.content }
 
-  already_had = 0
+  already_visited = 0
 
   image_urls.each_slice(concurrency).each do |group|
     threads = []
     group.each do |url|
-      threads << Thread.new {
+      threads << Thread.new do
         begin
           filename = File.basename(url.split('?')[0])
 
-          if File.exists?("#{directory}/#{filename}") and Mechanize.new.head(url)["content-length"].to_i === File.stat("#{directory}/#{filename}").size.to_i
-            puts "Already have #{url}"
-            already_had += 1
+          remote_content_length = Mechanize.new.head(url)["content-length"].to_i
+          local_file_size = File.stat("#{directory}/#{filename}").size.to_i
+          if File.exists?("#{directory}/#{filename}") and remote_content_length === local_file_size
+            # puts "Already have #{url}"
+            print '.'; $stdout.flush
+            already_visited += 1
           else
             puts "Saving photo #{url}"
             file = Mechanize.new.get(url)
@@ -62,7 +66,7 @@ loop do
         rescue
           puts "Error getting file, #{$!}"
         end
-      }
+      end
     end
     threads.each{|t| t.join }
   end
@@ -72,8 +76,8 @@ loop do
   if images.count < num
     puts "Our work here is done"
     break
-  elsif already_had == num
-    puts "Had already downloaded the last #{already_had} of #{num} most recent images - done."
+  elsif already_visited == num
+    puts "We've already downloaded the last #{already_visited} of #{num} most recent images, stopping."
     break
   else
     start += num
