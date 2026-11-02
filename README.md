@@ -1,6 +1,12 @@
 Tumblr Photo Downloader
 =======================
 
+**This script no longer works.** Tumblr now blocks the old `/api/read` endpoint it depends on. Use [gallery-dl](https://github.com/mikf/gallery-dl) instead:
+
+    uvx gallery-dl https://example.tumblr.com
+
+(or `pipx install gallery-dl` / `brew install gallery-dl`). This repo is archived.
+
 Ruby script to download all the photos from a Tumblr blog.
 
 Tumblr used to have a GUI backup tool for Mac OS but it appears to be unmaintained :''( [Tumblr Backup.app](http://staff.tumblr.com/post/286303145/tumblr-backup-mac-beta)
